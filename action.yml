@@ -24,11 +24,10 @@ runs:
   steps:
     - run: |  
         echo "Configuring FireClover SCA scanner"
-        curl -L $(curl -s https://api.github.com/repos/anchore/syft/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o syft.tar.gz
+        curl -sL $(curl -s https://api.github.com/repos/anchore/syft/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o syft.tar.gz
         tar xfz syft.tar.gz
-        curl -L $(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o grype.tar.gz
+        curl -sL $(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o grype.tar.gz
         tar xfz grype.tar.gz
-        find .
         ./grype db update
         # left for future use #cp ${GITHUB_ACTION_PATH}/.config-files ~/
       shell: bash
