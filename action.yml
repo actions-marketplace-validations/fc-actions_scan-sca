@@ -28,15 +28,16 @@ runs:
         tar xfz syft.tar.gz
         curl -L $(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o grype.tar.gz
         tar xfz grype.tar.gz
-        grype db update
+        find .
+        ./grype db update
         # left for future use #cp ${GITHUB_ACTION_PATH}/.config-files ~/
       shell: bash
 
     - run: |
         echo "Generating SBOM and scanning for vulnerabilities"
         filename=$(echo "${{ inputs.source }}"|sed 's|[:/]|-|g')
-        syft ${{ inputs.source }} -o syft-json=syft-${filename}.json
+        ./syft ${{ inputs.source }} -o syft-json=syft-${filename}.json
         echo "sbom=syft-${filename}.json" >> $GITHUB_OUTPUT
-        grype sbom:syft-${filename}.json -o json --file grype-${filename}.json ${{ inputs.grype-options }}
+        ./grype sbom:syft-${filename}.json -o json --file grype-${filename}.json ${{ inputs.grype-options }}
         echo "vulns=grype-${filename}.json" >> $GITHUB_OUTPUT
       shell: bash
