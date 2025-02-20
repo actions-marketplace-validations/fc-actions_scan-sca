@@ -1,0 +1,42 @@
+# action.yml
+name: 'FireClover SCA Scan'
+description: 'FireClover SBOM and vulnerability scanner'
+branding:
+  icon: 'alert-triangle'
+  color: 'orange'
+inputs:
+  source:
+    description: 'The source to generate an SBOM and scan for vulnerabilities'
+    required: true
+    default: ''
+  grype-options:  
+    description: 'Set failing, ignore unfixed, low severity vulnerabilities etc. of the tool output'
+    required: false
+    default: '--add-cpes-if-none --by-cve'
+outputs:
+  sbom:
+    description: "Path to a JSON SBOM file for the scan"
+  vulns:
+    description: "Path to a JSON results file for the vulnerability scan"
+    
+runs:
+  using: "composite"
+  steps:
+    - run: |  
+        echo "Configuring FireClover SCA scanner"
+        curl -L $(curl -s https://api.github.com/repos/anchore/syft/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o syft.tar.gz
+        tar xfz syft.tar.gz
+        curl -L $(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o grype.tar.gz
+        tar xfz grype.tar.gz
+        grype db update
+        # left for future use #cp ${GITHUB_ACTION_PATH}/.config-files ~/
+      shell: bash
+
+    - run: |
+        echo "Generating SBOM and scanning for vulnerabilities"
+        filename=$(echo "${{ inputs.source }}"|sed 's|[:/]|-|g')
+        syft ${{ inputs.source }} -o syft-json=syft-${filename}.json
+        echo "sbom=syft-${filename}.json" >> $GITHUB_OUTPUT
+        grype sbom:syft-${filename}.json -o json --file grype-${filename}.json ${{ inputs.grype-options }}
+        echo "vulns=grype-${filename}.json" >> $GITHUB_OUTPUT
+      shell: bash
