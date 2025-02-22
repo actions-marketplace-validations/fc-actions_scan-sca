@@ -23,7 +23,7 @@ runs:
         tar xfz syft.tar.gz
         curl -sL $(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.assets[]|select (.name | contains("linux_amd64.tar.gz"))| .browser_download_url') -o grype.tar.gz
         tar xfz grype.tar.gz
-        ./grype db update
+        ./grype db update || echo "Unable to update vuln db. Ignore if this is a transient issue."
         # left for future use #cp ${GITHUB_ACTION_PATH}/.config-files ~/
       shell: bash
 
