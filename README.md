@@ -1,4 +1,4 @@
-# scan-sca-action
+# scan-sca
 Scan Software Composition Analysis for vulnerabilities action for github/gitea workflows
 
 ## Usage
@@ -8,7 +8,7 @@ Scan Software Composition Analysis for vulnerabilities action for github/gitea w
 jobs:
   scan:    
     - name: Run the FireClover SCA scan action
-      uses: fc-actions/scan-sca-action@v0.1.5
+      uses: fc-actions/scan-sca@v0.1.5
       with:
         source: node:18
 ```
@@ -21,7 +21,7 @@ jobs:
       run: npm ci && npm run build && npm run test
 
     - name: Run the FireClover SCA scan action
-      uses: fc-actions/scan-sca-action@v0.1.5
+      uses: fc-actions/scan-sca@v0.1.5
       id: sca
       continue-on-error: true
       with:
@@ -36,7 +36,7 @@ jobs:
       run: echo 'See FireClover Docker build action for help'
 
     - name: Run the FireClover SCA scan action
-      uses: fc-actions/scan-sca-action@v0.1.5
+      uses: fc-actions/scan-sca@v0.1.5
       id: sca
       continue-on-error: true
       with:
@@ -44,7 +44,7 @@ jobs:
 
     - name: Upload vulnerability report
       needs: [steps.sca]
-      uses: fc-actions/report-action@v0.1.11
+      uses: fc-actions/report@v0.1.11
       continue-on-error: true
       with:
         create-repo-issues: 'Critical High'
